@@ -1,8 +1,13 @@
-# Use the official Nginx image as the base image
+# Build stage
+FROM node:alpine AS build
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+RUN npm run build
+
+# Production stage
 FROM nginx:latest
-
-# Copy the build output from the client directory to the nginx web root
-COPY dist/ /usr/share/nginx/html
-
-# Expose port 80
+COPY --from=build /app/dist /usr/share/nginx/html
 EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
