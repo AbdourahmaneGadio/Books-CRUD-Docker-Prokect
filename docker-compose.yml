@@ -1,0 +1,73 @@
+version: "3"
+services:
+
+  database:
+    image: mysql:5.6
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_NORMAL_USERNAME}
+      MYSQL_PASSWORD: ${MYSQL_NORMAL_PASSWORD}
+    expose:
+      - 3306
+    ports:
+      - "3306:3306"  # Port mapping format corrected
+    volumes:
+      - ./database/mysql-data:/var/lib/mysql
+    networks:
+      - mynetwork
+    # Verifie que la base de donnees est prete
+    healthcheck:
+      test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
+      timeout: 20s
+      retries: 10
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:4.9
+    ports:
+      - "8080:80"  # Port mapping format corrected
+    networks:
+      - mynetwork
+    environment:
+      PMA_HOST: ${MYSQL_DATABASE_HOST}  # Corrected PMA_HOST to match the service name
+      PMA_USER: ${MYSQL_NORMAL_USERNAME}
+      PMA_PASSWORD: ${MYSQL_NORMAL_PASSWORD}
+    depends_on:
+      database:
+        condition: service_healthy
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    environment:
+      DB_HOST: ${MYSQL_DATABASE_HOST}  # Corrected DB_HOST to match the service name
+      DB_USER: ${MYSQL_NORMAL_USERNAME}
+      DB_PASSWORD: ${MYSQL_NORMAL_PASSWORD}
+      DB_NAME: ${MYSQL_DATABASE}
+    ports:
+      - "3001:3001"
+    networks:
+      - mynetwork
+    depends_on:
+      database:
+        condition: service_healthy
+
+  nginx:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    environment:
+      REACT_APP_BACKEND_URL: http://backend:3000
+    ports:
+      - "80:80"
+    networks:
+      - mynetwork
+    depends_on:
+      - backend
+
+networks:
+  mynetwork:
+
+volumes:
+  mysql-data:

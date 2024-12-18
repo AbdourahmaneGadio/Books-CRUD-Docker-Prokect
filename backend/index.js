@@ -4,10 +4,10 @@ const mysql = require('mysql');
 const cors = require('cors');
 
 const db = mysql.createPool({
-    host: "localhost",
-    user: "root",
-    password: "nailton123",
-    database: "crudgames",
+    host:  process.env.DB_HOST || "localhost",
+    user: process.env.DB_USER || "root",
+    password: process.env.DB_PASSWORD || "nailton123",
+    database: process.env.DB_NAME || "crudgames",
 });
 
 server.use(express.json());
