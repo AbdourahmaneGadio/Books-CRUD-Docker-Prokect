@@ -19,7 +19,7 @@ server.post("/", (req, res) => {
   });
 });
 
-server.post("/register", (req, res) => {
+server.post("/books/create", (req, res) => {
   const { name } = req.body;
   const { cost } = req.body;
   const { categoryId } = req.body;
@@ -58,7 +58,7 @@ server.post("/register", (req, res) => {
   );
 });
 
-server.get("/games", (req, res) => {
+server.get("/books", (req, res) => {
   let sql = "SELECT * FROM Book";
   db.query(sql, (err, result) => {
     if (err) {
@@ -72,8 +72,8 @@ server.get("/games", (req, res) => {
   });
 });
 
-server.put("/edit", (req, res) => {
-  const { id } = req.body;
+server.put("/books/edit/:index", (req, res) => {
+  const { id } = req.params;
   const { name } = req.body;
   const { cost } = req.body;
   const { categoryId } = req.body;
@@ -115,7 +115,7 @@ server.put("/edit", (req, res) => {
   );
 });
 
-server.delete("/delete/:index", (req, res) => {
+server.delete("/books/delete/:index", (req, res) => {
   const { index } = req.params;
 
   let sql = "DELETE FROM Book WHERE id = ?";
