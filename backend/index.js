@@ -76,7 +76,7 @@ server.get("/books", (req, res) => {
 });
 
 server.put("/books/edit/:index", (req, res) => {
-  const { id } = req.params;
+  const { index } = req.params;
   const { name } = req.body;
   const { cost } = req.body;
   const { categoryId } = req.body;
@@ -101,7 +101,7 @@ server.put("/books/edit/:index", (req, res) => {
       pageNumber,
       synopsis,
       image,
-      id,
+      index,
     ],
     (err, result) => {
       if (err) {
@@ -178,7 +178,7 @@ server.get("/authors", (req, res) => {
 });
 
 server.put("/authors/edit/:index", (req, res) => {
-  const { id } = req.params;
+  const { index } = req.params;
   const { name } = req.body;
 
   let sql =
@@ -187,7 +187,7 @@ server.put("/authors/edit/:index", (req, res) => {
     sql,
     [
       name,
-      id,
+      index,
     ],
     (err, result) => {
       if (err) {
@@ -264,7 +264,7 @@ server.get("/categories", (req, res) => {
 });
 
 server.put("/categories/edit/:index", (req, res) => {
-  const { id } = req.params;
+  const { index } = req.params;
   const { name } = req.body;
 
   let sql =
@@ -273,7 +273,7 @@ server.put("/categories/edit/:index", (req, res) => {
     sql,
     [
       name,
-      id,
+      index,
     ],
     (err, result) => {
       if (err) {
