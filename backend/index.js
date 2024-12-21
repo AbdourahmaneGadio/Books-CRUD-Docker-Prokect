@@ -63,6 +63,15 @@ server.post("/books/create", (req, res) => {
 
 server.get("/books", (req, res) => {
   let sql = "SELECT * FROM Book";
+
+  const page = req.query.page ??  null;
+  const pageSize = req.query.pageSize ?? null;
+  const offset = (page - 1) * pageSize;
+
+    if (page && pageSize) {
+      sql += ` LIMIT ${pageSize} OFFSET ${offset}`;
+    }
+
   db.query(sql, (err, result) => {
     if (err) {
       res.status(500).json({
