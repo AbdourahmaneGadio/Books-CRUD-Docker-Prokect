@@ -7,6 +7,7 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import { useState } from "react";
 import axios from "axios";
+import MenuItem from '@mui/material/MenuItem';
 
 export default function BookDialog(props) {
     const [editValues, setEditValues] = useState({
@@ -15,7 +16,7 @@ export default function BookDialog(props) {
         isbn: props.isbn,
         cost: props.cost,
         authorId: props.authorId,
-        category: props.category,
+        categoryId: props.categoryId,
         parutionDate: props.parutionDate,
         pageNumber: props.pageNumber,
         synopsis: props.synopsis,
@@ -29,19 +30,23 @@ export default function BookDialog(props) {
             isbn: editValues.isbn,
             cost: editValues.cost,
             authorId: editValues.authorId,
-            category: editValues.category,
+            categoryId: editValues.categoryId,
             parutionDate: editValues.parutionDate,
             pageNumber: editValues.pageNumber,
             synopsis: editValues.synopsis,
             image: editValues.image
-        });
-        handleClose();
+        })
+        .then(() => {
+            handleClose();
+            // On pourrait ajouter ici un callback pour rafraîchir la liste des livres
+        })
+        .catch(error => console.error('Error updating book:', error));
     }
 
     const handleChangeValues = (value) => {
         setEditValues(prevValues => ({
             ...prevValues,
-            [value.target.id]: value.target.value,
+            [value.target.id || value.target.name]: value.target.value,
         }))
     }
 
@@ -50,111 +55,131 @@ export default function BookDialog(props) {
     };
 
     return (
-        <div>
-            <Dialog open={props.open} onClose={handleClose}>
-                <DialogTitle>Edit Book</DialogTitle>
-                <DialogContent>
-                    <TextField
-                        autoFocus
-                        margin="dense"
-                        id="name"
-                        label="Title"
-                        defaultValue={props.name}
-                        type="text"
-                        onChange={handleChangeValues}
-                        fullWidth
-                        variant="standard"
-                    />
-                    <TextField
-                        margin="dense"
-                        id="isbn"
-                        label="ISBN"
-                        defaultValue={props.isbn}
-                        type="text"
-                        onChange={handleChangeValues}
-                        fullWidth
-                        variant="standard"
-                    />
-                    <TextField
-                        margin="dense"
-                        id="cost"
-                        label="Price (€)"
-                        defaultValue={props.cost}
-                        type="number"
-                        onChange={handleChangeValues}
-                        fullWidth
-                        variant="standard"
-                    />
-                    <TextField
-                        margin="dense"
-                        id="authorId"
-                        label="Author"
-                        defaultValue={props.authorId}
-                        type="text"
-                        onChange={handleChangeValues}
-                        fullWidth
-                        variant="standard"
-                    />
-                    <TextField
-                        margin="dense"
-                        id="category"
-                        label="Category"
-                        defaultValue={props.category}
-                        type="text"
-                        onChange={handleChangeValues}
-                        fullWidth
-                        variant="standard"
-                    />
-                    <TextField
-                        margin="dense"
-                        id="parutionDate"
-                        label="Publication Date"
-                        defaultValue={props.parutionDate?.split('T')[0]}
-                        type="date"
-                        onChange={handleChangeValues}
-                        fullWidth
-                        variant="standard"
-                        InputLabelProps={{
-                            shrink: true,
-                        }}
-                    />
-                    <TextField
-                        margin="dense"
-                        id="pageNumber"
-                        label="Number of Pages"
-                        defaultValue={props.pageNumber}
-                        type="number"
-                        onChange={handleChangeValues}
-                        fullWidth
-                        variant="standard"
-                    />
-                    <TextField
-                        margin="dense"
-                        id="synopsis"
-                        label="Synopsis"
-                        defaultValue={props.synopsis}
-                        multiline
-                        rows={4}
-                        onChange={handleChangeValues}
-                        fullWidth
-                        variant="standard"
-                    />
-                    <TextField
-                        margin="dense"
-                        id="image"
-                        label="Image URL"
-                        defaultValue={props.image}
-                        type="text"
-                        onChange={handleChangeValues}
-                        fullWidth
-                        variant="standard"
-                    />
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleClose}>Cancel</Button>
-                    <Button onClick={handleEditValues}>Save</Button>
-                </DialogActions>
-            </Dialog>
-        </div>
+        <Dialog open={props.open} onClose={handleClose} maxWidth="md" fullWidth>
+            <DialogTitle>Edit Book</DialogTitle>
+            <DialogContent>
+                <TextField
+                    autoFocus
+                    margin="dense"
+                    id="name"
+                    label="Title"
+                    defaultValue={props.name}
+                    type="text"
+                    onChange={handleChangeValues}
+                    fullWidth
+                    variant="standard"
+                />
+                
+                <TextField
+                    margin="dense"
+                    id="isbn"
+                    label="ISBN"
+                    defaultValue={props.isbn}
+                    type="text"
+                    onChange={handleChangeValues}
+                    fullWidth
+                    variant="standard"
+                />
+
+                <TextField
+                    margin="dense"
+                    id="cost"
+                    label="Price (€)"
+                    defaultValue={props.cost}
+                    type="number"
+                    onChange={handleChangeValues}
+                    fullWidth
+                    variant="standard"
+                />
+
+                <TextField
+                    select
+                    margin="dense"
+                    id="authorId"
+                    name="authorId"
+                    label="Author"
+                    defaultValue={props.authorId}
+                    onChange={handleChangeValues}
+                    fullWidth
+                    variant="standard"
+                >
+                    {props.authors.map((author) => (
+                        <MenuItem key={author.id} value={author.id}>
+                            {author.name}
+                        </MenuItem>
+                    ))}
+                </TextField>
+
+                <TextField
+                    select
+                    margin="dense"
+                    id="categoryId"
+                    name="categoryId"
+                    label="Category"
+                    defaultValue={props.categoryId}
+                    onChange={handleChangeValues}
+                    fullWidth
+                    variant="standard"
+                >
+                    {props.categories.map((category) => (
+                        <MenuItem key={category.id} value={category.id}>
+                            {category.name}
+                        </MenuItem>
+                    ))}
+                </TextField>
+
+                <TextField
+                    margin="dense"
+                    id="parutionDate"
+                    label="Publication Date"
+                    defaultValue={props.parutionDate?.split('T')[0]}
+                    type="date"
+                    onChange={handleChangeValues}
+                    fullWidth
+                    variant="standard"
+                    InputLabelProps={{
+                        shrink: true,
+                    }}
+                />
+
+                <TextField
+                    margin="dense"
+                    id="pageNumber"
+                    label="Number of Pages"
+                    defaultValue={props.pageNumber}
+                    type="number"
+                    onChange={handleChangeValues}
+                    fullWidth
+                    variant="standard"
+                />
+
+                <TextField
+                    margin="dense"
+                    id="synopsis"
+                    label="Synopsis"
+                    defaultValue={props.synopsis}
+                    multiline
+                    rows={4}
+                    onChange={handleChangeValues}
+                    fullWidth
+                    variant="standard"
+                />
+
+                <TextField
+                    margin="dense"
+                    id="image"
+                    label="Image URL"
+                    defaultValue={props.image}
+                    type="text"
+                    onChange={handleChangeValues}
+                    fullWidth
+                    variant="standard"
+                />
+            </DialogContent>
+            <DialogActions>
+                <Button onClick={handleClose}>Cancel</Button>
+                <Button onClick={handleEditValues}>Save</Button>
+            </DialogActions>
+        </Dialog>
     );
 }
