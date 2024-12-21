@@ -1,14 +1,38 @@
-import React, {useState, useEffect} from 'react'
+import React, { useState, useEffect } from 'react'
 import './App.css'
 import Axios from "axios";
-import Card from "./components/card";
+import BookCard from "./components/BookCard";
 
 function App() {
-
     const baseUrl = "http://localhost:3001"
+    const [values, setValues] = useState({});
+    const [books, setBooks] = useState([]);
+    const [authors, setAuthors] = useState([]);
+    const [categories, setCategories] = useState([]);
 
-    const [values, setValues] = useState();
-    const [games, setGames] = useState();
+    // Charger les auteurs et catégories au démarrage
+    useEffect(() => {
+        // Charger les auteurs
+        Axios.get(`${baseUrl}/authors`)
+            .then((response) => {
+                setAuthors(response.data);
+            })
+            .catch(error => console.error('Error loading authors:', error));
+
+        // Charger les catégories
+        Axios.get(`${baseUrl}/categories`)
+            .then((response) => {
+                setCategories(response.data);
+            })
+            .catch(error => console.error('Error loading categories:', error));
+
+        // Charger les livres
+        Axios.get(`${baseUrl}/books`)
+            .then((response) => {
+                setBooks(response.data);
+            })
+            .catch(error => console.error('Error loading books:', error));
+    }, [])
 
     const handleChangeValues = (value) => {
         setValues((prevValue) => ({
@@ -18,92 +42,135 @@ function App() {
     }
 
     const handleClickButton = () => {
-        Axios.post(`${baseUrl}/register`, {
+        Axios.post(`${baseUrl}/books/create`, {
             name: values.name,
-            synopsis: values.synopsis,
-            cost: values.cost,
             isbn: values.isbn,
-            pageNumber: values.pageNumber,
+            cost: values.cost,
+            authorId: values.authorId,
             categoryId: values.categoryId,
-            auteurId: values.auteurId,    
-            parutionDate: values.parutionDate,       
-            image: values.image,      
-        }).then((response) =>{
-            console.log(response)
-        }).catch((err)=>{
-            console.log(err)
+            parutionDate: values.parutionDate,
+            pageNumber: values.pageNumber,
+            synopsis: values.synopsis,
+            image: values.image
+        })
+        .then((response) => {
+            console.log(response);
+            // Recharger les livres après l'ajout
+            Axios.get(`${baseUrl}/books`)
+                .then((response) => {
+                    setBooks(response.data);
+                });
         });
-
     }
 
-    useEffect(() => {
-        Axios.get(`${baseUrl}/games`)
-            .then((response)=>{
-            setGames(response.data)
-        })
+    return (
+        <div className="App">
+            <div className="container">
+                <h1 className="title">Book Manager</h1>
+                <h3>Add a Book</h3>
+                <div className="register-box">
+                    <input 
+                        className="register-input" 
+                        type="text" 
+                        name="name" 
+                        placeholder="Title" 
+                        onChange={handleChangeValues} 
+                    />
 
-        },[]
+                    <input 
+                        className="register-input" 
+                        type="text" 
+                        name="isbn" 
+                        placeholder="ISBN" 
+                        onChange={handleChangeValues} 
+                    />
+
+                    <input 
+                        className="register-input" 
+                        type="number" 
+                        name="cost" 
+                        min={1}
+                        placeholder="Price (€)" 
+                        onChange={handleChangeValues} 
+                    />
+
+                    <select 
+                        className="register-input" 
+                        name="authorId" 
+                        onChange={handleChangeValues}
+                        defaultValue=""
+                    >
+                        <option value="" disabled>Select an author</option>
+                        {authors.map(author => (
+                            <option key={author.id} value={author.id}>
+                                {author.name}
+                            </option>
+                        ))}
+                    </select>
+
+                    <select 
+                        className="register-input" 
+                        name="categoryId" 
+                        onChange={handleChangeValues}
+                        defaultValue=""
+                    >
+                        <option value="" disabled>Select a category</option>
+                        {categories.map(category => (
+                            <option key={category.id} value={category.id}>
+                                {category.name}
+                            </option>
+                        ))}
+                    </select>
+
+                    <input 
+                        className="register-input" 
+                        type="date" 
+                        name="parutionDate" 
+                        onChange={handleChangeValues} 
+                    />
+
+                    <input 
+                        className="register-input" 
+                        type="number" 
+                        name="pageNumber"
+                        min={1} 
+                        placeholder="Number of pages" 
+                        onChange={handleChangeValues} 
+                    />
+
+                    <textarea 
+                        className="register-input" 
+                        name="synopsis" 
+                        placeholder="Synopsis" 
+                        onChange={handleChangeValues} 
+                    />
+
+                    <input 
+                        className="register-input" 
+                        type="text" 
+                        name="image" 
+                        placeholder="Image URL" 
+                        onChange={handleChangeValues} 
+                    />
+
+                    <button className="register-button" onClick={handleClickButton}>
+                        Add Book
+                    </button>
+                </div>
+                <br/>
+                <div className="cards">
+                    {books.map((book) => (
+                        <BookCard
+                            key={book.id}
+                            {...book}
+                            authors={authors}
+                            categories={categories}
+                        />
+                    ))}
+                </div>
+            </div>
+        </div>
     )
-
-
-  return (
-    <div className="App">
-      <div className="container">
-          <h1 className="title">Bibliothèque</h1><br/>
-          <h3>Ajouter un livre</h3>
-          <div className="register-box">
-              <input className="register-input" type="text" name="name" placeholder="Title" onChange={handleChangeValues} />
-              <input className="register-input" type="text" name="synopsis" placeholder="Synopsis" onChange={handleChangeValues} />        
-              <input className="register-input" type="number" name="cost" placeholder="cost" onChange={handleChangeValues} />
-              <input className="register-input" type="number" name="isbn" placeholder="ISBN" onChange={handleChangeValues} />
-              <input className="register-input" type="number" name="pageNumber" placeholder="Nombre de pages" onChange={handleChangeValues} />
-              <input className="register-input" type="date" name="parutionDate" placeholder="date de parution" onChange={handleChangeValues} />
-              <input className="register-input" type="text" name="image" placeholder="URL de l'image" onChange={handleChangeValues} />
-
-
-
-              <select className="register-input" name="categoryId" id="categorie-select" onChange={handleChangeValues}>
-                <option value="">--Catégorie--</option>    
-                <option value="1">Action</option>    
-                <option value="2">Romance</option>
-                <option value="3">Drame</option>
-              </select>
-
-              <select className="register-input" name="auteurId" id="auteur-select" onChange={handleChangeValues}>
-                <option value="">--Auteur--</option>
-                <option value="1">Victor-Hugo</option>
-                <option value="2">Emile Zola</option>
-                <option value="3">Guy de Maupassant</option>
-              </select>
-
-              <button className="register-button" onClick={handleClickButton}>Add</button>
-          </div>
-
-          <br/>
-          <br/>
-          <br/>
-          <br/>
-          <h1>Livre déja éxistant</h1>
-          <br/>
-          <br/>
-
-          <div className="cards">
-              {typeof games !== 'undefined' &&
-                  games.map((game) => {
-                      return <Card
-                          key={game.idgames}
-                          id={game.idgames}
-                          name={game.name}
-                          cost={game.cost}
-                          category={game.category}
-
-                      >
-                      </Card>;
-                  })}
-          </div>
-      </div>
-    </div>
-  )
 }
 
 export default App
