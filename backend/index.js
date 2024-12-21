@@ -19,6 +19,7 @@ server.post("/", (req, res) => {
   });
 });
 
+//#region Books
 server.post("/books/create", (req, res) => {
   const { name } = req.body;
   const { cost } = req.body;
@@ -52,7 +53,9 @@ server.post("/books/create", (req, res) => {
           err,
         });
       } else {
-        console.log(result);
+        res.status(200).json({
+          message: "Insertion reussie.",
+        });
       }
     }
   );
@@ -132,5 +135,179 @@ server.delete("/books/delete/:index", (req, res) => {
     }
   });
 });
+//#endregion
+
+//#region Authors
+server.post("/authors/create", (req, res) => {
+  const { name } = req.body;
+
+  let sql =
+    "INSERT INTO Author (name) VALUES (?)";
+  db.query(
+    sql,
+    [
+      name,
+    ],
+    (err, result) => {
+      if (err) {
+        res.status(500).json({
+          message: "Une erreur est survenue.",
+          err,
+        });
+      } else {
+        res.status(200).json({
+          message: "Insertion reussie.",
+        });
+      }
+    }
+  );
+});
+
+server.get("/authors", (req, res) => {
+  let sql = "SELECT * FROM Author";
+  db.query(sql, (err, result) => {
+    if (err) {
+      res.status(500).json({
+        message: "Une erreur est survenue.",
+        err,
+      });
+    } else {
+      res.send(result);
+    }
+  });
+});
+
+server.put("/authors/edit/:index", (req, res) => {
+  const { id } = req.params;
+  const { name } = req.body;
+
+  let sql =
+    "UPDATE Author SET name = ? WHERE id = ?";
+  db.query(
+    sql,
+    [
+      name,
+      id,
+    ],
+    (err, result) => {
+      if (err) {
+        res.status(500).json({
+          message: "Une erreur est survenue.",
+          err,
+        });
+      } else {
+        res.status(200).json({
+          message: "Modification reussie.",
+        });
+      }
+    }
+  );
+});
+
+server.delete("/authors/delete/:index", (req, res) => {
+  const { index } = req.params;
+
+  let sql = "DELETE FROM Author WHERE id = ?";
+  db.query(sql, [index], (err, result) => {
+    if (err) {
+      res.status(500).json({
+        message: "Une erreur est survenue.",
+        err,
+      });
+    } else {
+      res.status(200).json({
+        message: "Suppression reussie.",
+      });
+    }
+  });
+});
+//#endregion
+
+//#region Categories
+server.post("/categories/create", (req, res) => {
+  const { name } = req.body;
+
+  let sql =
+    "INSERT INTO Category (name) VALUES (?)";
+  db.query(
+    sql,
+    [
+      name,
+    ],
+    (err, result) => {
+      if (err) {
+        res.status(500).json({
+          message: "Une erreur est survenue.",
+          err,
+        });
+      } else {
+        res.status(200).json({
+          message: "Insertion reussie.",
+        });
+      }
+    }
+  );
+});
+
+server.get("/categories", (req, res) => {
+  let sql = "SELECT * FROM Category";
+  db.query(sql, (err, result) => {
+    if (err) {
+      res.status(500).json({
+        message: "Une erreur est survenue.",
+        err,
+      });
+    } else {
+      res.send(result);
+    }
+  });
+});
+
+server.put("/categories/edit/:index", (req, res) => {
+  const { id } = req.params;
+  const { name } = req.body;
+
+  let sql =
+    "UPDATE Category SET name = ? WHERE id = ?";
+  db.query(
+    sql,
+    [
+      name,
+      id,
+    ],
+    (err, result) => {
+      if (err) {
+        res.status(500).json({
+          message: "Une erreur est survenue.",
+          err,
+        });
+      } else {
+        res.status(200).json({
+          message: "Modification reussie.",
+        });
+      }
+    }
+  );
+});
+
+server.delete("/categories/delete/:index", (req, res) => {
+  const { index } = req.params;
+
+  let sql = "DELETE FROM Category WHERE id = ?";
+  db.query(sql, [index], (err, result) => {
+    if (err) {
+      res.status(500).json({
+        message: "Une erreur est survenue.",
+        err,
+      });
+    } else {
+      res.status(200).json({
+        message: "Suppression reussie.",
+      });
+    }
+  });
+});
+//#endregion
+
 
 server.listen(3001, () => console.log("Running in the port 3001"));
