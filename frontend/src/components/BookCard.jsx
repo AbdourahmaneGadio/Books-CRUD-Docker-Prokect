@@ -16,6 +16,9 @@ const BookCard = (props) => {
         axios.delete(`${baseUrl}/books/delete/${props.id}`);
     }
 
+    const  book  = props;
+    const author = book.authors.find(author => author.id === book.authorId);
+
     return (
         <>
         <BookDialog 
@@ -29,7 +32,7 @@ const BookCard = (props) => {
             </div>
             <div className="info">
                 <h3>{props.name}</h3>
-                    <p className="author">By: {props.authors[props.id-1].name}</p>
+                    <p className="author">By: {author.name}</p>
                 <p className="isbn">ISBN: {props.isbn}</p>
                 <p className="price">€{props.cost}</p>
                 <p className="category">{props.category}</p>

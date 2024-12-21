@@ -2,13 +2,19 @@ import React, { useState, useEffect } from 'react'
 import './App.css'
 import Axios from "axios";
 import BookCard from "./components/BookCard";
+import { Pagination } from '@mui/material';
 
 function App() {
     const baseUrl = "http://localhost:3001"
+    
     const [values, setValues] = useState({});
     const [books, setBooks] = useState([]);
     const [authors, setAuthors] = useState([]);
     const [categories, setCategories] = useState([]);
+
+    const booksPerPage = 5
+    const [nombreTotalBooks, setTotalCount] = useState(0);
+    const [page, setPage] = useState(1);
 
     // Charger les auteurs et catégories au démarrage
     useEffect(() => {
@@ -26,13 +32,21 @@ function App() {
             })
             .catch(error => console.error('Error loading categories:', error));
 
-        // Charger les livres
+        // Charge les livres et recupere la pagination
         Axios.get(`${baseUrl}/books`)
+            .then((response) => {
+                setTotalCount(response.data.length);
+            })
+            .catch(error => console.error('Error loading books:', error));
+
+        Axios.get(`${baseUrl}/books?page=1&pageSize=${booksPerPage}`)
             .then((response) => {
                 setBooks(response.data);
             })
             .catch(error => console.error('Error loading books:', error));
     }, [])
+
+    const count = Math.ceil(nombreTotalBooks / booksPerPage);
 
     const handleChangeValues = (value) => {
         setValues((prevValue) => ({
@@ -53,15 +67,23 @@ function App() {
             synopsis: values.synopsis,
             image: values.image
         })
-        .then((response) => {
-            console.log(response);
-            // Recharger les livres après l'ajout
-            Axios.get(`${baseUrl}/books`)
-                .then((response) => {
-                    setBooks(response.data);
-                });
-        });
+            .then((response) => {
+                console.log(response);
+                // Recharger les livres après l'ajout
+                Axios.get(`${baseUrl}/books?page=${page}&pageSize=${booksPerPage}`)
+                    .then((response) => {
+                        setBooks(response.data);
+                    });
+            });
     }
+
+    const handleChangePage = (event, value) => {
+        setPage(value);
+        Axios.get(`${baseUrl}/books?page=${value}&pageSize=${booksPerPage}`)
+            .then((response) => {
+                setBooks(response.data);
+            });
+    };
 
     return (
         <div className="App">
@@ -69,34 +91,34 @@ function App() {
                 <h1 className="title">Book Manager</h1>
                 <h3>Add a Book</h3>
                 <div className="register-box">
-                    <input 
-                        className="register-input" 
-                        type="text" 
-                        name="name" 
-                        placeholder="Title" 
-                        onChange={handleChangeValues} 
+                    <input
+                        className="register-input"
+                        type="text"
+                        name="name"
+                        placeholder="Title"
+                        onChange={handleChangeValues}
                     />
 
-                    <input 
-                        className="register-input" 
-                        type="text" 
-                        name="isbn" 
-                        placeholder="ISBN" 
-                        onChange={handleChangeValues} 
+                    <input
+                        className="register-input"
+                        type="text"
+                        name="isbn"
+                        placeholder="ISBN"
+                        onChange={handleChangeValues}
                     />
 
-                    <input 
-                        className="register-input" 
-                        type="number" 
-                        name="cost" 
+                    <input
+                        className="register-input"
+                        type="number"
+                        name="cost"
                         min={1}
-                        placeholder="Price (€)" 
-                        onChange={handleChangeValues} 
+                        placeholder="Price (€)"
+                        onChange={handleChangeValues}
                     />
 
-                    <select 
-                        className="register-input" 
-                        name="authorId" 
+                    <select
+                        className="register-input"
+                        name="authorId"
                         onChange={handleChangeValues}
                         defaultValue=""
                     >
@@ -108,9 +130,9 @@ function App() {
                         ))}
                     </select>
 
-                    <select 
-                        className="register-input" 
-                        name="categoryId" 
+                    <select
+                        className="register-input"
+                        name="categoryId"
                         onChange={handleChangeValues}
                         defaultValue=""
                     >
@@ -122,42 +144,42 @@ function App() {
                         ))}
                     </select>
 
-                    <input 
-                        className="register-input" 
-                        type="date" 
-                        name="parutionDate" 
-                        onChange={handleChangeValues} 
+                    <input
+                        className="register-input"
+                        type="date"
+                        name="parutionDate"
+                        onChange={handleChangeValues}
                     />
 
-                    <input 
-                        className="register-input" 
-                        type="number" 
+                    <input
+                        className="register-input"
+                        type="number"
                         name="pageNumber"
-                        min={1} 
-                        placeholder="Number of pages" 
-                        onChange={handleChangeValues} 
+                        min={1}
+                        placeholder="Number of pages"
+                        onChange={handleChangeValues}
                     />
 
-                    <textarea 
-                        className="register-input" 
-                        name="synopsis" 
-                        placeholder="Synopsis" 
-                        onChange={handleChangeValues} 
+                    <textarea
+                        className="register-input"
+                        name="synopsis"
+                        placeholder="Synopsis"
+                        onChange={handleChangeValues}
                     />
 
-                    <input 
-                        className="register-input" 
-                        type="text" 
-                        name="image" 
-                        placeholder="Image URL" 
-                        onChange={handleChangeValues} 
+                    <input
+                        className="register-input"
+                        type="text"
+                        name="image"
+                        placeholder="Image URL"
+                        onChange={handleChangeValues}
                     />
 
                     <button className="register-button" onClick={handleClickButton}>
                         Add Book
                     </button>
                 </div>
-                <br/>
+                <br />
                 <div className="cards">
                     {books.map((book) => (
                         <BookCard
@@ -168,6 +190,14 @@ function App() {
                         />
                     ))}
                 </div>
+                {count > 1 && (
+                    <Pagination
+                        count={count}
+                        page={page}
+                        onChange={handleChangePage}
+                        color="primary" 
+                        showFirstButton showLastButton
+                    />)}
             </div>
         </div>
     )
