@@ -4,6 +4,8 @@ import BookDialog from "./dialog/BookDialog";
 import axios from "axios";
 
 const BookCard = (props) => {
+    const baseUrl = "http://localhost:3001"
+
     const [open, setOpen] = useState(false);
 
     const cardOpen = () => {
@@ -11,7 +13,7 @@ const BookCard = (props) => {
     }
 
     const handleDeleteBook = () => {
-        axios.delete(`http://localhost:3001/books/delete/${props.id}`);
+        axios.delete(`${baseUrl}/books/delete/${props.id}`);
     }
 
     return (
@@ -27,7 +29,7 @@ const BookCard = (props) => {
             </div>
             <div className="info">
                 <h3>{props.name}</h3>
-                <p className="author">By: {props.authorId}</p>
+                    <p className="author">By: {props.authors[props.id-1].name}</p>
                 <p className="isbn">ISBN: {props.isbn}</p>
                 <p className="price">€{props.cost}</p>
                 <p className="category">{props.category}</p>

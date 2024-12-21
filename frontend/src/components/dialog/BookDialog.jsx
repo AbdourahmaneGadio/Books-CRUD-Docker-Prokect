@@ -10,6 +10,8 @@ import axios from "axios";
 import MenuItem from '@mui/material/MenuItem';
 
 export default function BookDialog(props) {
+    const baseUrl = "http://localhost:3001"
+
     const [editValues, setEditValues] = useState({
         id: props.id,
         name: props.name,
@@ -24,7 +26,7 @@ export default function BookDialog(props) {
     });
 
     const handleEditValues = () => {
-        axios.put(`http://localhost:3001/books/${editValues.id}`, {
+        axios.put(`${baseUrl}/books/edit/${editValues.id}`, {
             id: editValues.id,
             name: editValues.name,
             isbn: editValues.isbn,
