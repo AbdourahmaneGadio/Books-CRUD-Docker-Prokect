@@ -1,0 +1,87 @@
+.book-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 20px;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.book-image {
+    width: 150px;
+    margin-right: 20px;
+}
+
+.book-image img {
+    width: 100%;
+    height: auto;
+    border-radius: 4px;
+}
+
+.info {
+    flex-grow: 1;
+    padding-right: 20px;
+}
+
+.info h3 {
+    margin: 0 0 10px 0;
+    color: #333;
+}
+
+.info p {
+    margin: 5px 0;
+    color: #666;
+}
+
+.info .author {
+    font-weight: 500;
+    color: #444;
+}
+
+.info .price {
+    font-weight: bold;
+    color: #2c5282;
+}
+
+.info .synopsis {
+    margin-top: 10px;
+    font-style: italic;
+    color: #666;
+    line-height: 1.4;
+}
+
+.actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.actions button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.2s;
+}
+
+.edit {
+    background-color: #4299e1;
+    color: white;
+}
+
+.edit:hover {
+    background-color: #3182ce;
+}
+
+.delete {
+    background-color: #f56565;
+    color: white;
+}
+
+.delete:hover {
+    background-color: #e53e3e;
+}
