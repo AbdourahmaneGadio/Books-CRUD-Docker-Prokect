@@ -89,6 +89,7 @@ function App() {
                         className="register-input" 
                         type="number" 
                         name="cost" 
+                        min={1}
                         placeholder="Price (€)" 
                         onChange={handleChangeValues} 
                     />
@@ -131,7 +132,8 @@ function App() {
                     <input 
                         className="register-input" 
                         type="number" 
-                        name="pageNumber" 
+                        name="pageNumber"
+                        min={1} 
                         placeholder="Number of pages" 
                         onChange={handleChangeValues} 
                     />
