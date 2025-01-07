@@ -6,11 +6,13 @@ import { Pagination } from '@mui/material';
 
 function App() {
     const baseUrl = "http://localhost:3001"
-    
+
     const [values, setValues] = useState({});
     const [books, setBooks] = useState([]);
     const [authors, setAuthors] = useState([]);
+    const [valuesAuthor, setValuesAuthor] = useState({});
     const [categories, setCategories] = useState([]);
+    const [valuesCategory, setValuesCategory] = useState({});
 
     const booksPerPage = 5
     const [nombreTotalBooks, setTotalCount] = useState(0);
@@ -46,8 +48,20 @@ function App() {
             .catch(error => console.error('Error loading books:', error));
     }, [])
 
+    //#region Pagination
+
     const count = Math.ceil(nombreTotalBooks / booksPerPage);
 
+    const handleChangePage = (event, value) => {
+        setPage(value);
+        Axios.get(`${baseUrl}/books?page=${value}&pageSize=${booksPerPage}`)
+            .then((response) => {
+                setBooks(response.data);
+            });
+    };
+    //#endregion
+
+    //#region Changement valeurs
     const handleChangeValues = (value) => {
         setValues((prevValue) => ({
             ...prevValue,
@@ -55,7 +69,24 @@ function App() {
         }))
     }
 
-    const handleClickButton = () => {
+    const handleChangeValuesAuthor = (value) => {
+        setValuesAuthor((prevValue) => ({
+            ...prevValue,
+            [value.target.name]: value.target.value,
+        }))
+    }
+
+    const handleChangeValuesCategory = (value) => {
+        setValuesCategory((prevValue) => ({
+            ...prevValue,
+            [value.target.name]: value.target.value,
+        }))
+    }
+    //#endregion
+
+    //#region Ajout
+
+    const addBook = () => {
         Axios.post(`${baseUrl}/books/create`, {
             name: values.name,
             isbn: values.isbn,
@@ -77,19 +108,63 @@ function App() {
             });
     }
 
-    const handleChangePage = (event, value) => {
-        setPage(value);
-        Axios.get(`${baseUrl}/books?page=${value}&pageSize=${booksPerPage}`)
-            .then((response) => {
-                setBooks(response.data);
-            });
-    };
+    const addAuthor = () => {
+        Axios.post(`${baseUrl}/authors/create`, {
+            name: valuesAuthor.name,
+        })
+            .then(() => {
+                Axios.get(`${baseUrl}/authors`)
+                    .then((response) => {
+                        setAuthors(response.data);
+                    });
+            }).catch((err) => { console.log(err) });
+    }
+
+    const addCategory = () => {
+        Axios.post(`${baseUrl}/categories/create`, {
+            name: valuesCategory.name,
+        })
+            .then(() => {
+                Axios.get(`${baseUrl}/categories`)
+                    .then((response) => {
+                        setCategories(response.data);
+                    });
+            }).catch((err) => { console.log(err) });
+    }
+    //#endregion
 
     return (
         <div className="App">
-            <div className="container">
+            <div className="container" style={{ marginLeft: "auto", marginRight: "auto", marginBottom:20 }}>
                 <h1 className="title">Book Manager</h1>
+
+                <h3>Add a Author</h3>
+                <div className="register-box">
+                    <input
+                        className="register-input"
+                        type="text"
+                        name="name"
+                        placeholder="Author"
+                        onChange={handleChangeValuesAuthor}
+                    />             <button className="register-button" onClick={addAuthor}>
+                        Add Author
+                    </button>
+                </div>
+
+                <h3>Add a Category</h3>
+                <div className="register-box">
+                    <input
+                        className="register-input"
+                        type="text"
+                        name="name"
+                        placeholder="Category"
+                        onChange={handleChangeValuesCategory}
+                    />             <button className="register-button" onClick={addCategory}>
+                        Add Category
+                    </button></div>
+
                 <h3>Add a Book</h3>
+
                 <div className="register-box">
                     <input
                         className="register-input"
@@ -175,7 +250,7 @@ function App() {
                         onChange={handleChangeValues}
                     />
 
-                    <button className="register-button" onClick={handleClickButton}>
+                    <button className="register-button" onClick={addBook}>
                         Add Book
                     </button>
                 </div>
@@ -195,7 +270,7 @@ function App() {
                         count={count}
                         page={page}
                         onChange={handleChangePage}
-                        color="primary" 
+                        color="primary"
                         showFirstButton showLastButton
                     />)}
             </div>
